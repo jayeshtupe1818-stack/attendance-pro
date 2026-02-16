@@ -7,10 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCheck } from "lucide-react";
 
+interface TeacherClass {
+  id: string;
+  name: string;
+  markedToday: boolean;
+}
+
 const TeacherDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [classes, setClasses] = useState<any[]>([]);
+  const [classes, setClasses] = useState<TeacherClass[]>([]);
 
   useEffect(() => {
     if (!user) return;

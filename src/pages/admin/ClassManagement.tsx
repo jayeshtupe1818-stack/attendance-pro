@@ -8,9 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type ClassWithCounts = Database["public"]["Tables"]["classes"]["Row"] & {
+  class_students: { id: string }[];
+  class_teachers: { id: string; teacher_id: string }[];
+};
 
 const ClassManagement = () => {
-  const [classes, setClasses] = useState<any[]>([]);
+  const [classes, setClasses] = useState<ClassWithCounts[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [open, setOpen] = useState(false);

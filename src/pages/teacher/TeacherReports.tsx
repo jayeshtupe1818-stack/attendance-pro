@@ -7,14 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { Database } from "@/integrations/supabase/types";
+
+type AttendanceRecord = Database["public"]["Tables"]["attendance_records"]["Row"];
+type Class = Database["public"]["Tables"]["classes"]["Row"];
 
 const TeacherReports = () => {
   const { user } = useAuth();
-  const [classes, setClasses] = useState<any[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [records, setRecords] = useState<any[]>([]);
+  const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [profiles, setProfiles] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
