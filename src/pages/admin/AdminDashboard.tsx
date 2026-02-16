@@ -14,7 +14,7 @@ const AdminDashboard = () => {
         supabase.from("user_roles").select("id", { count: "exact" }).eq("role", "student"),
         supabase.from("user_roles").select("id", { count: "exact" }).eq("role", "teacher"),
         supabase.from("classes").select("id", { count: "exact" }),
-        supabase.from("attendance_records").select("status"),
+        supabase.from("attendance_records").select("status, date"),
       ]);
 
       const total = attendanceRes.data?.length || 0;
@@ -33,8 +33,8 @@ const AdminDashboard = () => {
         const d = new Date();
         d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split("T")[0];
-        const dayRecords = attendanceRes.data?.filter((r: any) => r.date === dateStr) || [];
-        const dayPresent = dayRecords.filter((r: any) => r.status === "present" || r.status === "late").length;
+        const dayRecords = attendanceRes.data?.filter((r) => r.date === dateStr) || [];
+        const dayPresent = dayRecords.filter((r) => r.status === "present" || r.status === "late").length;
         days.push({ date: dateStr.slice(5), rate: dayRecords.length > 0 ? Math.round((dayPresent / dayRecords.length) * 100) : 0 });
       }
       setChartData(days);

@@ -8,10 +8,27 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 const COLORS = ["hsl(142, 76%, 36%)", "hsl(0, 84%, 60%)", "hsl(38, 92%, 50%)"];
 
+interface ClassStats {
+  classId: string;
+  className: string;
+  present: number;
+  absent: number;
+  late: number;
+  total: number;
+  rate: number;
+}
+
+interface RecentRecord {
+  id: string;
+  date: string;
+  status: string;
+  className: string;
+}
+
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [classStats, setClassStats] = useState<any[]>([]);
-  const [recentRecords, setRecentRecords] = useState<any[]>([]);
+  const [classStats, setClassStats] = useState<ClassStats[]>([]);
+  const [recentRecords, setRecentRecords] = useState<RecentRecord[]>([]);
 
   useEffect(() => {
     if (!user) return;

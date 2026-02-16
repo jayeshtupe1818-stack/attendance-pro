@@ -6,10 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Database } from "@/integrations/supabase/types";
+
+type AttendanceRecord = Database["public"]["Tables"]["attendance_records"]["Row"];
+type Class = Database["public"]["Tables"]["classes"]["Row"];
 
 const AdminReports = () => {
-  const [records, setRecords] = useState<any[]>([]);
-  const [classes, setClasses] = useState<any[]>([]);
+  const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
