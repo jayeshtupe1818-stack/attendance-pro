@@ -13,7 +13,7 @@ type Class = Database["public"]["Tables"]["classes"]["Row"];
 
 const AdminReports = () => {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [classes, setClasses] = useState<Pick<Class, "id" | "name">[]>([]);
   const [selectedClass, setSelectedClass] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");

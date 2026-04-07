@@ -14,7 +14,7 @@ type Class = Database["public"]["Tables"]["classes"]["Row"];
 
 const TeacherReports = () => {
   const { user } = useAuth();
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [classes, setClasses] = useState<Pick<Class, "id" | "name">[]>([]);
   const [selectedClass, setSelectedClass] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
