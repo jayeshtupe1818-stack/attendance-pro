@@ -4,7 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
 
 interface UserWithRole {
   user_id: string;
@@ -17,25 +22,52 @@ const UserManagement = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email");
-      const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+  const fetchUsers = async () => {
+    const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email");
+    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
 
-      if (profiles) {
-        const roleMap = new Map(roles?.map((r) => [r.user_id, r.role]) || []);
-        setUsers(
-          profiles.map((p) => ({
-            user_id: p.user_id,
-            full_name: p.full_name,
-            email: p.email,
-            role: roleMap.get(p.user_id) || "unassigned",
-          }))
-        );
-      }
-    };
+    if (profiles) {
+      const roleMap = new Map(roles?.map((r) => [r.user_id, r.role]) || []);
+      setUsers(
+        profiles.map((p) => ({
+          user_id: p.user_id,
+          full_name: p.full_name,
+          email: p.email,
+          role: roleMap.get(p.user_id) || "unassigned",
+        }))
+      );
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleRoleChange = async (userId: string, currentRole: string, newRole: string) => {
+    if (newRole === "unassigned") {
+      if (currentRole !== "unassigned") {
+        const { error } = await supabase.from("user_roles").delete().eq("user_id", userId);
+        if (error) {
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+          return;
+        }
+      }
+    } else if (currentRole === "unassigned") {
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: newRole as AppRole });
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("user_roles").update({ role: newRole as AppRole }).eq("user_id", userId);
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+        return;
+      }
+    }
+    toast({ title: "Role updated", description: `Role changed to ${newRole}` });
+    fetchUsers();
+  };
 
   const filtered = users.filter(
     (u) =>
@@ -75,9 +107,17 @@ const UserManagement = () => {
                     <TableCell className="font-medium">{u.full_name || "—"}</TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>
-                      <Badge variant={u.role === "admin" ? "default" : u.role === "teacher" ? "secondary" : "outline"} className="capitalize">
-                        {u.role}
-                      </Badge>
+                      <Select value={u.role} onValueChange={(val) => handleRoleChange(u.user_id, u.role, val)}>
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">Unassigned</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="teacher">Teacher</SelectItem>
+                          <SelectItem value="student">Student</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                   </TableRow>
                 ))
